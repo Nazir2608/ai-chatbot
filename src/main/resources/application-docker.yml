@@ -1,0 +1,11 @@
+# Docker Profile
+# Connects to Ollama container instead of localhost
+
+llm:
+  ollama:
+    url: http://ollama:11434  # Service name in docker-compose
+
+storage:
+  type: local
+  local:
+    root: /app/uploads

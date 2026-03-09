@@ -1,0 +1,24 @@
+# Production Profile
+# Uses S3 and requires environment variables for secrets
+
+spring:
+  thymeleaf:
+    cache: true  # Enable template caching in prod
+
+storage:
+  type: s3
+  s3:
+    bucket: ${S3_BUCKET}
+    region: ${AWS_REGION:us-east-1}
+
+llm:
+  provider: ${LLM_PROVIDER:openai}
+  openai:
+    api-key: ${OPENAI_API_KEY}
+
+logging:
+  level:
+    com.aichatbot: WARN
+    root: WARN
+  file:
+    name: /var/log/ai-chatbot/app.log

@@ -1,0 +1,62 @@
+# AI Chatbot Configuration
+# Profiles: local (default), prod, docker
+
+spring:
+  application:
+    name: ai-chatbot
+  
+  thymeleaf:
+    cache: false  # Disable caching in dev
+    prefix: classpath:/templates/
+    suffix: .html
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+server:
+  port: 8080
+  error:
+    whitelabel:
+      enabled: false
+
+# Storage Strategy: 'local' or 's3'
+# Switch instantly without code changes
+storage:
+  type: local
+  local:
+    root: ./uploads
+  s3:
+    bucket: handwritten-notes
+    region: us-east-1
+
+# LLM Strategy: 'ollama' or 'openai'
+# For handwritten notes, you MUST use a Vision model:
+# - Ollama: llava, moondream, cogvlm2 (NOT gemma3:4b - it's text only!)
+# - OpenAI: gpt-4o (vision capable)
+llm:
+  provider: ollama
+  ollama:
+    url: http://localhost:11434
+    model: llava  # Pull first: ollama pull llava
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    model: gpt-4o
+
+# Actuator for health checks (required for production)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.aichatbot: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

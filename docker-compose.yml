@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LLM_PROVIDER=ollama
+      - STORAGE_TYPE=local
+      # Optional: If using OpenAI in Docker
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      - ollama
+    networks:
+      - ai-network
+
+  # Ollama service for local AI
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - ai-network
+    # Pull model on first run
+    entrypoint: >
+      sh -c "
+        ollama serve &
+        sleep 10 &&
+        ollama pull llava &&
+        wait
+      "
+
+volumes:
+  ollama-data:
+
+networks:
+  ai-network:
+    driver: bridge

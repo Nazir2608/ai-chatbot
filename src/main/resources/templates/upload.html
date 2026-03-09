@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Handwritten Note - AI Chatbot</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>📝 AI Handwritten Notes Chatbot</h1>
+        <p class="subtitle">Upload a handwritten note (PDF or Image). I'll understand diagrams, corrections, and messy writing.</p>
+        
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        
+        <form th:action="@{/upload}" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="form-group">
+                <label for="file">Select File (PDF, PNG, JPG):</label>
+                <input type="file" id="file" name="file" accept=".pdf,.png,.jpg,.jpeg" required>
+                <small>Max size: 10MB</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Storage Backend:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="storageType" value="local" checked> 
+                        Local Storage (Dev)
+                    </label>
+                    <label>
+                        <input type="radio" name="storageType" value="s3"> 
+                        AWS S3 (Prod)
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Analyze Note</button>
+        </form>
+        
+        <div class="info-box">
+            <h3>⚙️ Current Configuration</h3>
+            <ul>
+                <li><strong>LLM Provider:</strong> <span th:text="${@environment.getProperty('llm.provider')}">ollama</span></li>
+                <li><strong>Model:</strong> <span th:text="${@environment.getProperty('llm.ollama.model')}">llava</span></li>
+                <li><strong>Storage:</strong> <span th:text="${@environment.getProperty('storage.type')}">local</span></li>
+            </ul>
+            <p class="hint">Switch providers in application.yml or via env vars</p>
+        </div>
+    </div>
+</body>
+</html>
