@@ -32,11 +32,9 @@ public class DocumentController {
     @GetMapping("/document/{documentId}")
     public String viewDocument(@PathVariable String documentId, Model model) {
         // Verify document exists
-        if (!storageService.exists(documentId, "original.png") && 
-            !storageService.exists(documentId, "original.pdf")) {
+        if (!storageService.exists(documentId, "original.png") && !storageService.exists(documentId, "original.pdf")) {
             throw new RuntimeException("Document not found");
         }
-        
         model.addAttribute("documentId", documentId);
         return "document"; // Renders document.html
     }
@@ -50,16 +48,10 @@ public class DocumentController {
         // Try PNG first (converted from PDF or uploaded as image)
         if (storageService.exists(documentId, "original.png")) {
             Resource resource = storageService.loadAsResource(documentId, "original.png");
-            return ResponseEntity.ok()
-                    .contentType(MediaType.IMAGE_PNG)
-                    .body(resource);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
         }
-        
-        // Fallback to original extension
         Resource resource = storageService.loadAsResource(documentId, "original");
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);
     }
 
     /**
@@ -69,8 +61,6 @@ public class DocumentController {
     @ResponseBody
     public ResponseEntity<Resource> serveAnalysis(@PathVariable String documentId) {
         Resource resource = storageService.loadAsResource(documentId, "analysis.json");
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(resource);
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(resource);
     }
 }

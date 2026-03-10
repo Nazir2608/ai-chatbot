@@ -7,13 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Chat REST API Controller
- * 
- * Handles AJAX requests from the chat UI.
- * Stateless - each request contains documentId and message.
- * History is managed server-side by ChatService.
- */
 @RestController
 @RequestMapping("/api/chat")
 @RequiredArgsConstructor
@@ -25,11 +18,7 @@ public class ChatController {
      * Send message and get AI response
      */
     @PostMapping("/{documentId}")
-    public ResponseEntity<ChatResponse> chat(
-            @PathVariable String documentId,
-            @RequestBody ChatRequest request) {
-        
-        // Validate
+    public ResponseEntity<ChatResponse> chat(@PathVariable String documentId, @RequestBody ChatRequest request) {
         if (request.getMessage() == null || request.getMessage().trim().isEmpty()) {
             return ResponseEntity.badRequest()
                     .body(ChatResponse.builder()
@@ -37,7 +26,6 @@ public class ChatController {
                             .error("Message cannot be empty")
                             .build());
         }
-        
         ChatResponse response = chatService.chat(documentId, request.getMessage());
         return ResponseEntity.ok(response);
     }

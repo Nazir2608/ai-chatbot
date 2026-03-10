@@ -28,7 +28,7 @@ public class AnalysisResult {
         private String originalContent; // For crossedOut type
         private String crossedOutContent; // For crossedOut type
         private String description; // For diagrams
-        private String location; // "top-right", "left-margin", etc.
+        private Object location; // "top-right", "left-margin", etc.
         private BoundingBox bbox; // x, y, width, height for UI overlay
         
         // Diagram-specific
