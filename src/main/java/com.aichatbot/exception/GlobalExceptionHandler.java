@@ -5,12 +5,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-/**
- * Global Exception Handler
- * 
- * Catches errors and displays user-friendly messages in UI
- * instead of stack traces.
- */
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {

@@ -42,10 +42,6 @@ public class UploadController {
         }
     }
 
-    /**
-     * REST API endpoint for programmatic uploads
-     * Returns JSON with documentId for API clients
-     */
     @PostMapping("/api/upload")
     @ResponseBody
     public Document handleApiUpload(@RequestParam("file") MultipartFile file) {

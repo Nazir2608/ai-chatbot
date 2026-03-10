@@ -14,16 +14,21 @@
         }
         .image-panel {
             border: 1px solid #ddd;
-            overflow: auto;
+            overflow: hidden;
             background: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
+            padding: 0;
+        }
+        .image-panel embed {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 700px;
         }
         .image-panel img {
             max-width: 100%;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: block;
+            margin: 20px auto;
         }
         .chat-panel {
             display: flex;
@@ -67,88 +72,94 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <header>
-            <h2>💬 Chat with your Note</h2>
-            <a th:href="@{/}" class="btn btn-secondary">← Upload New</a>
-        </header>
-        
-        <div class="split-view">
-            <!-- Left: Image Viewer -->
-            <div class="image-panel">
-                <img th:src="@{/api/documents/{id}/image(id=${documentId})}" 
-                     alt="Uploaded Note" 
-                     onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>Image Not Found</text></svg>'">
-            </div>
-            
-            <!-- Right: Chat Interface -->
-            <div class="chat-panel">
-                <div class="chat-messages" id="chatMessages">
-                    <div class="message assistant">
-                        Hello! I've analyzed your handwritten note. Ask me anything about it!
-                        <br><br>
-                        <small>Try: "What was crossed out?" or "Describe the diagram"</small>
-                    </div>
+<div class="container-fluid">
+    <header>
+        <h2>💬 Chat with your Note</h2>
+        <a th:href="@{/}" class="btn btn-secondary">← Upload New</a>
+    </header>
+
+    <div class="split-view">
+        <!-- Left: Document Viewer -->
+        <div class="image-panel">
+            <!-- PDF viewer -->
+            <embed th:if="${isPdf}"
+                   th:src="@{/api/documents/{id}/image(id=${documentId})}"
+                   type="application/pdf"
+                   width="100%"
+                   height="100%">
+
+            <!-- Image viewer -->
+            <img th:unless="${isPdf}"
+                 th:src="@{/api/documents/{id}/image(id=${documentId})}"
+                 alt="Uploaded Note"
+                 onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><text x=%2250%%22 y=%2250%%22 text-anchor=%22middle%22>Image Not Found</text></svg>'">
+        </div>
+
+        <!-- Right: Chat Interface -->
+        <div class="chat-panel">
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant">
+                    Hello! I've analyzed your document. Ask me anything about it!
+                    <br><br>
+                    <small>Try: "What was crossed out?" or "Describe the diagram"</small>
                 </div>
-                
-                <div class="chat-input">
-                    <input type="text" id="messageInput" placeholder="Ask about the note..." 
-                           style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-right: 10px;">
-                    <button onclick="sendMessage()" class="btn btn-primary">Send</button>
-                </div>
-                <div id="loading" class="loading" style="padding: 0 15px 10px;">Thinking...</div>
             </div>
+
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Ask about the document..."
+                       style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; margin-right: 10px;">
+                <button onclick="sendMessage()" class="btn btn-primary">Send</button>
+            </div>
+            <div id="loading" class="loading" style="padding: 0 15px 10px;">Thinking...</div>
         </div>
     </div>
+</div>
 
-    <script th:inline="javascript">
-        const documentId = [[${documentId}]];
-        const messagesDiv = document.getElementById('chatMessages');
-        const input = document.getElementById('messageInput');
-        const loading = document.getElementById('loading');
+<script th:inline="javascript">
+    const documentId = [[${documentId}]];
+    const messagesDiv = document.getElementById('chatMessages');
+    const input = document.getElementById('messageInput');
+    const loading = document.getElementById('loading');
 
-        // Allow Enter key to send
-        input.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') sendMessage();
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        addMessage(text, 'user');
+        input.value = '';
+        loading.style.display = 'block';
+
+        fetch(`/api/chat/${documentId}`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({message: text})
+        })
+        .then(r => r.json())
+        .then(data => {
+            loading.style.display = 'none';
+            if (data.success) {
+                addMessage(data.response, 'assistant');
+            } else {
+                addMessage('Error: ' + data.error, 'assistant');
+            }
+        })
+        .catch(err => {
+            loading.style.display = 'none';
+            addMessage('Error: Could not reach server', 'assistant');
         });
+    }
 
-        function sendMessage() {
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Add user message
-            addMessage(text, 'user');
-            input.value = '';
-            loading.style.display = 'block';
-
-            // Call API
-            fetch(`/api/chat/${documentId}`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: text})
-            })
-            .then(r => r.json())
-            .then(data => {
-                loading.style.display = 'none';
-                if (data.success) {
-                    addMessage(data.response, 'assistant');
-                } else {
-                    addMessage('Error: ' + data.error, 'assistant');
-                }
-            })
-            .catch(err => {
-                loading.style.display = 'none';
-                addMessage('Error: Could not reach server', 'assistant');
-            });
-        }
-
-        function addMessage(text, role) {
-            const div = document.createElement('div');
-            div.className = `message ${role}`;
-            div.textContent = text;
-            messagesDiv.appendChild(div);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-    </script>
+    function addMessage(text, role) {
+        const div = document.createElement('div');
+        div.className = `message ${role}`;
+        div.textContent = text;
+        messagesDiv.appendChild(div);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+</script>
 </body>
 </html>

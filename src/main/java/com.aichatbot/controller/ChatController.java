@@ -14,9 +14,6 @@ public class ChatController {
 
     private final ChatService chatService;
 
-    /**
-     * Send message and get AI response
-     */
     @PostMapping("/{documentId}")
     public ResponseEntity<ChatResponse> chat(@PathVariable String documentId, @RequestBody ChatRequest request) {
         if (request.getMessage() == null || request.getMessage().trim().isEmpty()) {
@@ -30,9 +27,6 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Clear chat history for a document
-     */
     @PostMapping("/{documentId}/clear")
     public ResponseEntity<Void> clearHistory(@PathVariable String documentId) {
         chatService.clearHistory(documentId);
