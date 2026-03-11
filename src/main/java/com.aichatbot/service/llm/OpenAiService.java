@@ -41,9 +41,7 @@ public class OpenAiService implements LlmService {
     private String model;
 
     public OpenAiService(WebClient.Builder webClientBuilder, ObjectMapper objectMapper) {
-        this.webClient = webClientBuilder
-                .baseUrl("https://api.openai.com/v1")
-                .build();
+        this.webClient = webClientBuilder.baseUrl("https://api.openai.com/v1").build();
         this.objectMapper = objectMapper;
     }
 
@@ -54,21 +52,11 @@ public class OpenAiService implements LlmService {
         String prompt = "Analyze this handwritten note image. Extract all text, diagrams, crossed-out corrections, and margin notes. Return as structured JSON with schema: {elements: [{type: 'text'|'crossedOut'|'diagram'|'marginNote', content: string, originalContent?: string, crossedOutContent?: string, location?: string}]}";
 
         try {
-            List<Map<String, Object>> messages = List.of(
-                Map.of(
-                    "role", "user",
-                    "content", List.of(
-                        Map.of("type", "text", "text", prompt),
-                        Map.of(
-                            "type", "image_url",
-                            "image_url", Map.of("url", "data:image/png;base64," + imageBase64)
-                        )
-                    )
-                )
-            );
+            List<Map<String, Object>> messages = List.of(Map.of("role", "user", "content",
+                    List.of(Map.of("type", "text", "text", prompt),
+                        Map.of("type", "image_url", "image_url", Map.of("url", "data:image/png;base64," + imageBase64)))));
 
-            Map<String, Object> requestBody = Map.of(
-                "model", model,
+            Map<String, Object> requestBody = Map.of("model", model,
                 "messages", messages,
                 "max_tokens", 4096,
                 "response_format", Map.of("type", "json_object")
@@ -105,9 +93,9 @@ public class OpenAiService implements LlmService {
     @Override
     public String chat(String userMessage, String analysisJson, List<ChatMessage> history) {
         log.info("Chatting with OpenAI");
-        
+
         List<Map<String, Object>> messages = new ArrayList<>();
-        
+
         // System message with context
         messages.add(Map.of(
             "role", "system",

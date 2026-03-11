@@ -12,7 +12,7 @@ Production-ready Spring Boot application that uses Vision-Language Models (VLM) 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Java 17+
+- Java 21+
 - Maven 3.8+
 - Docker & Docker Compose (optional)
 - Ollama (for local AI) OR OpenAI API key

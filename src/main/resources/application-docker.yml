@@ -1,9 +1,6 @@
-# Docker Profile
-# Connects to Ollama container instead of localhost
-
 llm:
   ollama:
-    url: http://ollama:11434  # Service name in docker-compose
+    url: http://ollama:11434
 
 storage:
   type: local

@@ -35,7 +35,6 @@ public class DocumentController {
             Resource resource = storageService.loadAsResource(documentId, "original.png");
             return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(resource);
         }
-        // Fixed: was "original" (missing extension)
         Resource resource = storageService.loadAsResource(documentId, "original.pdf");
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF).body(resource);
     }

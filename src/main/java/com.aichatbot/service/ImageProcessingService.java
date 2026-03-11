@@ -15,17 +15,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
-/**
- * Image Pre-processing Service
- *
- * Handles conversion and optimization before sending to VLM:
- * - PDF -> PNG conversion (300 DPI for readability)
- * - Image resizing (if too large for model context)
- * - Format normalization (always PNG)
- *
- * Note: Advanced preprocessing (deskew, denoise) would use OpenCV here,
- * but we keep it simple for portability. For production, add OpenCV here.
- */
 @Slf4j
 @Service
 public class ImageProcessingService {
@@ -33,21 +22,15 @@ public class ImageProcessingService {
     private static final int DPI = 300;
     private static final int MAX_WIDTH = 2048; // Most VLMs have context limits
 
-    /**
-     * Convert PDF input stream to list of Base64 PNG images (one per page)
-     */
     public List<String> convertPdfToImages(InputStream pdfStream) throws IOException {
         List<String> base64Images = new ArrayList<String>();
-
         try (PDDocument document = Loader.loadPDF(pdfStream.readAllBytes())) {
             PDFRenderer renderer = new PDFRenderer(document);
             for (int i = 0; i < document.getNumberOfPages(); i++) {
                 log.debug("Rendering PDF page {} at {} DPI", i + 1, DPI);
                 BufferedImage image = renderer.renderImageWithDPI(i, DPI);
-
                 // Resize if too large (maintaining aspect ratio)
                 BufferedImage resized = resizeIfNeeded(image);
-
                 String base64 = imageToBase64(resized);
                 base64Images.add(base64);
             }
@@ -57,15 +40,11 @@ public class ImageProcessingService {
         return base64Images;
     }
 
-    /**
-     * Convert single image to Base64 PNG
-     */
     public String processImage(InputStream imageStream) throws IOException {
         BufferedImage image = ImageIO.read(imageStream);
         if (image == null) {
             throw new IOException("Could not read image");
         }
-
         BufferedImage resized = resizeIfNeeded(image);
         return imageToBase64(resized);
     }
@@ -74,18 +53,12 @@ public class ImageProcessingService {
         if (original.getWidth() <= MAX_WIDTH) {
             return original;
         }
-
         double ratio = (double) MAX_WIDTH / original.getWidth();
         int newHeight = (int) (original.getHeight() * ratio);
-
-        log.debug("Resizing image from {}x{} to {}x{}",
-                  original.getWidth(), original.getHeight(), MAX_WIDTH, newHeight);
-
+        log.debug("Resizing image from {}x{} to {}x{}", original.getWidth(), original.getHeight(), MAX_WIDTH, newHeight);
         BufferedImage resized = new BufferedImage(MAX_WIDTH, newHeight, BufferedImage.TYPE_INT_RGB);
         resized.getGraphics().drawImage(
-            original.getScaledInstance(MAX_WIDTH, newHeight, java.awt.Image.SCALE_SMOOTH),
-            0, 0, null
-        );
+            original.getScaledInstance(MAX_WIDTH, newHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
         return resized;
     }
 

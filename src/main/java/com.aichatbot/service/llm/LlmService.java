@@ -15,23 +15,7 @@ import java.util.List;
  * 2. chat: Answer questions based on the analysis context
  */
 public interface LlmService {
-    
-    /**
-     * Analyze an image using a Vision-Language Model
-     * 
-     * @param imageBase64 Base64 encoded image (PNG/JPEG)
-     * @param documentId Document identifier for tracking
-     * @return Structured analysis of the handwritten content
-     */
+
     AnalysisResult analyzeImage(String imageBase64, String documentId);
-    
-    /**
-     * Chat with the document context
-     * 
-     * @param userMessage Current question from user
-     * @param analysisJson The structured analysis (context)
-     * @param history Previous messages for context
-     * @return AI response text
-     */
     String chat(String userMessage, String analysisJson, List<ChatMessage> history);
 }

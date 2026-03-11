@@ -90,13 +90,7 @@ public class OllamaService implements LlmService {
                 """.replace("DOC_ID", documentId);
 
         try {
-            Map<String, Object> requestBody = Map.of(
-                    "model", modelName,
-                    "prompt", prompt,
-                    "images", List.of(imageBase64),
-                    "stream", false,
-                    "format", "json"
-            );
+            Map<String, Object> requestBody = Map.of("model", modelName, "prompt", prompt, "images", List.of(imageBase64), "stream", false, "format", "json");
 
             String response = webClient.post()
                     .uri("/api/generate")
@@ -110,7 +104,6 @@ public class OllamaService implements LlmService {
                     .bodyToMono(String.class)
                     .block();
 
-            // Parse Ollama response - it returns JSON with a "response" field containing our JSON
             Map<String, Object> responseMap = objectMapper.readValue(response, Map.class);
             String jsonContent = (String) responseMap.get("response");
 
@@ -151,11 +144,7 @@ public class OllamaService implements LlmService {
             conversation.append("\nuser: ").append(userMessage);
             conversation.append("\nassistant: ");
 
-            Map<String, Object> requestBody = Map.of(
-                    "model", modelName,
-                    "prompt", conversation.toString(),
-                    "stream", false
-            );
+            Map<String, Object> requestBody = Map.of("model", modelName, "prompt", conversation.toString(), "stream", false);
 
             String response = webClient.post()
                     .uri("/api/generate")

@@ -3,18 +3,6 @@ package com.aichatbot.model;
 import lombok.Data;
 import java.util.List;
 
-/**
- * Structured representation of VLM (Vision Language Model) analysis
- * 
- * This is the CRITICAL data structure. Instead of raw OCR text, we store
- * semantic understanding including:
- * - crossedOut: Text that was crossed out and replaced (crucial for understanding corrections)
- * - diagrams: Flowcharts, boxes, arrows
- * - marginNotes: Annotations in margins
- * - arrows: Directional relationships between elements
- * 
- * This JSON is the ONLY context provided to the chatbot. The chatbot never sees the raw image.
- */
 @Data
 public class AnalysisResult {
     private String documentId;

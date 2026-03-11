@@ -30,10 +30,8 @@ public class UploadController {
         }
         try {
             log.info("Processing upload: {}, size: {} bytes", file.getOriginalFilename(), file.getSize());
-            // Process document (analysis happens here)
             Document doc = documentService.processDocument(file);
             redirectAttrs.addFlashAttribute("success", "Document uploaded successfully! Pages: " + doc.getPageCount());
-            // Redirect to document view/chat page
             return "redirect:/document/" + doc.getDocumentId();
         } catch (Exception e) {
             log.error("Upload failed", e);

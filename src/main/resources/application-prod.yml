@@ -1,9 +1,6 @@
-# Production Profile
-# Uses S3 and requires environment variables for secrets
-
 spring:
   thymeleaf:
-    cache: true  # Enable template caching in prod
+    cache: true
 
 storage:
   type: s3

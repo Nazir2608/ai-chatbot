@@ -14,12 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
-/**
- * Local Filesystem Storage Implementation
- * 
- * Used for development and local testing.
- * Stores files in ./uploads/{documentId}/ directory
- */
 @Slf4j
 @Service
 public class LocalStorageService implements StorageService {
@@ -38,7 +32,6 @@ public class LocalStorageService implements StorageService {
             Files.createDirectories(docPath);
             Path targetPath = docPath.resolve(filename);
             Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            
             log.info("Stored file locally: {}", targetPath);
             return targetPath.toString();
         } catch (IOException e) {
@@ -53,7 +46,6 @@ public class LocalStorageService implements StorageService {
             Files.createDirectories(docPath);
             Path targetPath = docPath.resolve(filename);
             Files.writeString(targetPath, content);
-            
             log.info("Stored text locally: {}", targetPath);
         } catch (IOException e) {
             throw new RuntimeException("Failed to store text locally", e);

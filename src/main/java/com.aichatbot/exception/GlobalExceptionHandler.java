@@ -13,6 +13,6 @@ public class GlobalExceptionHandler {
     public String handleException(Exception e, Model model) {
         log.error("Unhandled exception", e);
         model.addAttribute("error", "An error occurred: " + e.getMessage());
-        return "error"; // templates/error.html
+        return "error";
     }
 }
